@@ -1,34 +1,37 @@
-// Gestion des gestes tactiles
-let touchStartX = 0;
+const form = document.getElementById('postForm');
+const feed = document.getElementById('feed');
 
-document.addEventListener('touchstart', (e) => {
-  touchStartX = e.touches[0].clientX;
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(form);
+  await fetch('/api/post', { method: 'POST', body: formData });
+  form.reset();
+  loadPosts();
 });
 
-document.addEventListener('touchend', (e) => {
-  const touchEndX = e.changedTouches[0].clientX;
-  if (touchEndX < touchStartX - 50) {
-    nextPost(); // Swipe gauche
-  } else if (touchEndX > touchStartX + 50) {
-    prevPost(); // Swipe droit
-  }
-});
-
-// Upload avec feedback tactile
-document.getElementById('upload-btn').addEventListener('click', () => {
-  navigator.vibrate(100); // Vibration
-});
-
-// Détection réseau
-function checkNetwork() {
-  const connection = navigator.connection || { effectiveType: '4g' };
-  return connection.effectiveType.includes('2g') ? 'low' : 'high';
-}
-
-// Chargement adaptatif
-function loadMedia() {
-  const quality = checkNetwork();
-  document.querySelectorAll('[data-src]').forEach(el => {
-    el.src = quality === 'high' ? el.dataset.src : el.dataset.lowRes;
+async function loadPosts() {
+  feed.innerHTML = 'Chargement...';
+  const res = await fetch('/api/posts');
+  const posts = await res.json();
+  feed.innerHTML = '';
+  posts.forEach(post => {
+    const div = document.createElement('div');
+    div.className = 'post';
+    div.innerHTML = \`
+      <strong>\${post.username}</strong> • <small>\${new Date(post.date).toLocaleString()}</small><br/>
+      \${post.text}<br/>
+      \${post.media ? renderMedia(post.media) : ''}
+    \`;
+    feed.appendChild(div);
   });
 }
+
+function renderMedia(url) {
+  if (url.match(/\.(mp4|webm)$/)) {
+    return \`<video src="\${url}" controls class="media"></video>\`;
+  } else {
+    return \`<img src="\${url}" class="media"/>\`;
+  }
+}
+
+loadPosts();

@@ -1,35 +1,32 @@
-:root {
-  --glitch-1: #0f0;
-  --glitch-2: #f0f;
-  --bg: #111;
-}
-
 body {
+  font-family: sans-serif;
+  background: #f0f0f0;
   margin: 0;
-  padding: 0;
-  font-family: 'Courier New', monospace;
-  background: var(--bg);
-  touch-action: pan-y;
+  padding: 1em;
 }
-
-/* Effets glitch */
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+#feed {
+  margin-top: 2em;
+}
 .post {
-  animation: glitch 1s infinite;
+  background: white;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-radius: 10px;
 }
-
-@keyframes glitch {
-  0% { opacity: 0.8; }
-  50% { opacity: 1; filter: hue-rotate(90deg); }
-}
-
-/* Optimisation mobile */
-@media (max-width: 768px) {
-  .post {
-    width: 100vw;
-    margin: 5px 0;
-  }
-  
-  button {
-    min-height: 48px; /* Tappable area */
-  }
+.media {
+  max-width: 100%;
+  margin-top: 0.5em;
 }

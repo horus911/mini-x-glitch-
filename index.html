@@ -1,9 +1,25 @@
-<div class="text-settings">
-  <input type="text" id="post-text" placeholder="Écris ton texte glitch...">
-  <select id="font-style">
-    <option value="glitch">Style Glitch</option>
-    <option value="retro">Style Retro</option>
-    <option value="matrix">Style Matrix</option>
-  </select>
-  <button onclick="addTextToPost()">Ajouter</button>
-</div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini X</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Mini X 🐦</h1>
+    
+    <form id="postForm" enctype="multipart/form-data">
+      <input type="text" name="username" placeholder="Votre pseudo" required />
+      <textarea name="text" placeholder="Exprimez-vous..." required></textarea>
+      <input type="file" name="media" accept="image/*,video/*" />
+      <button type="submit">Publier</button>
+    </form>
+    
+    <div id="feed"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

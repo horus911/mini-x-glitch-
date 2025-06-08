@@ -1,37 +1,33 @@
 const express = require('express');
 const multer = require('multer');
-const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Config multer pour l'upload
-const upload = multer({ 
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 20 * 1024 * 1024 } // 20MB max
-});
-
-// Middleware d'optimisation média
-async function optimizeMedia(file) {
-  if (file.mimetype.includes('image')) {
-    return await sharp(file.buffer)
-      .resize(800)
-      .avif({ quality: 70 })
-      .toBuffer();
-  }
-  return file.buffer;
-}
-
-// Route d'upload
-app.post('/upload', upload.single('media'), async (req, res) => {
-  try {
-    const optimizedFile = await optimizeMedia(req.file);
-    res.json({ 
-      url: `/media/${Date.now()}`, 
-      size: `${(optimizedFile.length / 1024).toFixed(1)}KB` 
-    });
-  } catch (err) {
-    res.status(500).send("Erreur d'optimisation");
-  }
-});
-
+const upload = multer({ dest: 'uploads/' });
 app.use(express.static('public'));
-app.listen(3000, () => console.log('Server running'));
+app.use(express.json());
+
+const postsFile = './posts.json';
+let posts = fs.existsSync(postsFile) ? JSON.parse(fs.readFileSync(postsFile)) : [];
+
+// API: Get all posts
+app.get('/api/posts', (req, res) => {
+  res.json(posts.reverse());
+});
+
+// API: New post
+app.post('/api/post', upload.single('media'), (req, res) => {
+  const { text, username } = req.body;
+  const media = req.file ? '/uploads/' + req.file.filename : null;
+  const post = { id: Date.now(), text, username, media, date: new Date().toISOString() };
+  posts.push(post);
+  fs.writeFileSync(postsFile, JSON.stringify(posts));
+  res.json({ success: true });
+});
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.listen(PORT, () => console.log('Mini X lancé sur port', PORT));
